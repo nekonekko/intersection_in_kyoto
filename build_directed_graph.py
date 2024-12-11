@@ -20,8 +20,17 @@ for _, row in df_bus_stops_containing_intersection.iterrows():
     else:
         edges.add((row["horizontal"], row["vertical"]))
 
-pd.DataFrame(list(nodes), columns=["node"]).to_csv("data/nodes.csv", index=False)
-pd.DataFrame(edges, columns=["from", "to"]).to_csv("data/edges.csv", index=False)
+df_nodes = pd.DataFrame(list(nodes), columns=["node"])
+df_edges = pd.DataFrame(list(edges), columns=["from", "to"])
+for _, row in df_nodes.iterrows():
+    node = row["node"]
+    if node in df_bus_stops_containing_intersection["vertical"].values:
+        df_nodes.loc[df_nodes["node"] == node, "is_vertical"] = True
+    else:
+        df_nodes.loc[df_nodes["node"] == node, "is_vertical"] = False
+
+df_nodes.to_csv("data/nodes.csv", index=False)
+df_edges.to_csv("data/edges.csv", index=False)
 
 G = nx.DiGraph()
 G.add_nodes_from(nodes)
